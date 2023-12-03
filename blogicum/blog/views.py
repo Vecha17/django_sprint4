@@ -27,14 +27,14 @@ class PostListView(PostMixin, ListView):
     ordering = '-pub_date'
     paginate_by = VISIBLE_POSTS
     queryset = Post.objects.annotate(
-            comment_count=Count('comments')
-        ).select_related(
-            'category', 'location', 'author'
-        ).filter(
-            is_published=True,
-            category__is_published=True,
-            pub_date__lte=datetime.now()
-        )
+        comment_count=Count('comments')
+    ).select_related(
+        'category', 'location', 'author'
+    ).filter(
+        is_published=True,
+        category__is_published=True,
+        pub_date__lte=datetime.now()
+    )
 
 
 class PostCreateView(LoginRequiredMixin, PostMixin, CreateView):
@@ -111,9 +111,9 @@ class CategoryListView(ListView):
     def get_queryset(self):
         queryset = Post.objects.annotate(
             comment_count=Count('comments')
-            ).select_related(
-                'category'
-            ).filter(
+        ).select_related(
+            'category'
+        ).filter(
             category__slug=self.kwargs['category_slug'],
             category__is_published=True,
             is_published=True,

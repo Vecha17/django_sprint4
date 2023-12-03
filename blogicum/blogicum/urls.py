@@ -20,7 +20,7 @@ urlpatterns = [
     path('auth/', include('django.contrib.auth.urls')),
     path('', include('blog.urls', namespace='blog')),
     path('pages/', include('pages.urls', namespace='pages')),
-    ]
+]
 
 handler404 = 'pages.views.page_not_found'
 handler500 = 'pages.views.server_error'
