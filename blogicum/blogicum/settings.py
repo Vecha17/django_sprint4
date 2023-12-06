@@ -100,7 +100,7 @@ LOGIN_REDIRECT_URL = 'blog:index'
 
 LANGUAGE_CODE = 'ru-RU'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/Moscow'
 
 USE_I18N = True
 

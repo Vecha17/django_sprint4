@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Category, Location, Post
+from .models import Category, Comment, Location, Post
 
 
 class PostInline(admin.StackedInline):
@@ -58,6 +58,13 @@ class LocationAdmin(admin.ModelAdmin):
         'created_at'
     )
     list_editable = ('is_published',)
+
+
+@admin.register(Comment)
+class CommentAdmin(admin.ModelAdmin):
+    list_display = (
+        'text',
+    )
 
 
 admin.site.empty_value_display = 'Не задано'

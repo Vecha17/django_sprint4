@@ -1,8 +1,8 @@
-from django.db import models
 from django.contrib.auth import get_user_model
+from django.db import models
+from django.urls import reverse
 
 from core.models import PublishedModel
-
 
 User = get_user_model()
 
@@ -22,7 +22,7 @@ class Category(PublishedModel):
         verbose_name_plural = 'Категории'
 
     def __str__(self) -> str:
-        return self.title
+        return self.title[:30]
 
 
 class Location(PublishedModel):
@@ -33,7 +33,7 @@ class Location(PublishedModel):
         verbose_name_plural = 'Местоположения'
 
     def __str__(self) -> str:
-        return self.name
+        return self.name[:30]
 
 
 class Post(PublishedModel):
@@ -58,7 +58,6 @@ class Post(PublishedModel):
     )
     category = models.ForeignKey(
         Category,
-        related_name='posts',
         verbose_name='Категория',
         null=True,
         on_delete=models.SET_NULL,
@@ -70,11 +69,15 @@ class Post(PublishedModel):
     )
 
     class Meta:
+        default_related_name = 'posts'
         verbose_name = 'публикация'
         verbose_name_plural = 'Публикации'
 
     def __str__(self) -> str:
-        return self.title
+        return self.title[:30]
+
+    def get_absolute_url(self):
+        return reverse('blog:post_detail', kwargs={'post_id': self.pk})
 
 
 class Comment(models.Model):
