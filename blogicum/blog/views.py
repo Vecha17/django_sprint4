@@ -13,9 +13,8 @@ from blog.mixins import CommentMixin, PostAddition, PostDispMixin, PostMixin
 from blog.models import Category, Comment, Post, User
 
 
-class PostListView(PostMixin, PostAddition, ListView):
+class PostListView(PostAddition, PostMixin, ListView):
     template_name = 'blog/index.html'
-    ordering = '-pub_date'
 
 
 class PostCreateView(LoginRequiredMixin, PostMixin, CreateView):
@@ -71,7 +70,7 @@ class PostDetailView(PostMixin, DetailView):
         return context
 
 
-class CategoryListView(ListView, PostAddition):
+class CategoryListView(PostAddition, ListView):
     template_name = 'blog/category.html'
 
     def get_queryset(self):
@@ -80,15 +79,7 @@ class CategoryListView(ListView, PostAddition):
                 slug=self.kwargs['category_slug'], is_published=True
             )
         )
-        queryset = _category.posts.annotate(
-            comment_count=Count('comments')
-        ).select_related(
-            'category', 'author', 'location'
-        ).filter(
-            is_published=True,
-            pub_date__lte=timezone.now()
-        ).order_by('-pub_date')
-        return queryset
+        return super().get_queryset().filter(category=_category)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -108,17 +99,7 @@ class ProfileUser(ListView, PostAddition):
         _user = get_object_or_404(
             User.objects.filter(username=self.kwargs['username'])
         )
-        queryset = _user.posts.annotate(
-            comment_count=Count('comments')
-        ).select_related(
-            'author', 'category', 'location'
-        ).filter(
-            Q(author__username=self.request.user.username)
-            | (Q(category__is_published=True)
-                & Q(is_published=True)
-                & Q(pub_date__lte=timezone.now()))
-        ).order_by('-pub_date')
-        return queryset
+        return super().get_queryset().filter(user=_user)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

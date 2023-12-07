@@ -11,15 +11,18 @@ VISIBLE_POSTS = 10
 
 class PostAddition:
     paginate_by = VISIBLE_POSTS
-    queryset = Post.objects.annotate(
-        comment_count=Count('comments')
-    ).select_related(
-        'category', 'location', 'author'
-    ).filter(
-        is_published=True,
-        category__is_published=True,
-        pub_date__lte=timezone.now()
-    )
+
+    def get_queryset(self):
+        Post.objects.annotate(
+            comment_count=Count('comments')
+        ).select_related(
+            'category', 'location', 'author'
+        ).filter(
+            is_published=True,
+            category__is_published=True,
+            pub_date__lte=timezone.now()
+        ).order_by('-pub_date')
+        return super().get_queryset()
 
 
 class PostDispMixin:
