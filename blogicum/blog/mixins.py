@@ -13,7 +13,7 @@ class PostAddition:
     paginate_by = VISIBLE_POSTS
 
     def get_queryset(self):
-        Post.objects.annotate(
+        return Post.objects.annotate(
             comment_count=Count('comments')
         ).select_related(
             'category', 'location', 'author'
@@ -22,7 +22,6 @@ class PostAddition:
             category__is_published=True,
             pub_date__lte=timezone.now()
         ).order_by('-pub_date')
-        return super().get_queryset()
 
 
 class PostDispMixin:

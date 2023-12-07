@@ -91,7 +91,7 @@ class CategoryListView(PostAddition, ListView):
         return context
 
 
-class ProfileUser(ListView, PostAddition):
+class ProfileUser(PostAddition, ListView):
     model = Post
     template_name = 'blog/profile.html'
 
@@ -99,7 +99,13 @@ class ProfileUser(ListView, PostAddition):
         _user = get_object_or_404(
             User.objects.filter(username=self.kwargs['username'])
         )
-        return super().get_queryset().filter(user=_user)
+        if _user == self.request.user:
+            return _user.posts.annotate(
+                comment_count=Count('comments')
+            ).select_related(
+                'category', 'author', 'location'
+            ).order_by('-pub_date')
+        return super().get_queryset().filter(author=_user)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -143,9 +149,9 @@ class CommentCreateView(LoginRequiredMixin, CommentMixin, CreateView):
         return super().form_valid(form)
 
 
-class CommentUpdateView(CommentMixin, LoginRequiredMixin, UpdateView):
+class CommentUpdateView(LoginRequiredMixin, CommentMixin, UpdateView):
     pass
 
 
-class CommentDeleteView(CommentMixin, LoginRequiredMixin, DeleteView):
+class CommentDeleteView(LoginRequiredMixin, CommentMixin, DeleteView):
     pass
