@@ -1,5 +1,5 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.db.models import Count, Q
+from django.db.models import Count
 from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django.urls import reverse, reverse_lazy
@@ -54,9 +54,9 @@ class PostDetailView(PostMixin, DetailView):
     def get_object(self):
         obj = super().get_object()
         if (self.request.user != obj.author) and (
-            (not obj.is_published) or
-            (not obj.category.is_published) or
-            (obj.pub_date > timezone.now())
+            (not obj.is_published)
+            or (not obj.category.is_published)
+            or (obj.pub_date > timezone.now())
         ):
             raise Http404
         return obj
@@ -145,7 +145,7 @@ class CommentCreateView(LoginRequiredMixin, CommentMixin, CreateView):
         form.instance.post = get_object_or_404(
             Post,
             pk=self.kwargs['post_id'],
-            )
+        )
         return super().form_valid(form)
 
 
