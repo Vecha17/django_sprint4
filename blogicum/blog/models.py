@@ -6,6 +6,8 @@ from core.models import PublishedModel
 
 User = get_user_model()
 
+SYMBOL_LIMIT = 30
+
 
 class Category(PublishedModel):
     title = models.CharField('Заголовок', max_length=256)
@@ -22,7 +24,7 @@ class Category(PublishedModel):
         verbose_name_plural = 'Категории'
 
     def __str__(self) -> str:
-        return self.title[:30]
+        return self.title[:SYMBOL_LIMIT]
 
 
 class Location(PublishedModel):
@@ -33,7 +35,7 @@ class Location(PublishedModel):
         verbose_name_plural = 'Местоположения'
 
     def __str__(self) -> str:
-        return self.name[:30]
+        return self.name[:SYMBOL_LIMIT]
 
 
 class Post(PublishedModel):
@@ -74,7 +76,7 @@ class Post(PublishedModel):
         verbose_name_plural = 'Публикации'
 
     def __str__(self) -> str:
-        return self.title[:30]
+        return self.title[:SYMBOL_LIMIT]
 
     def get_absolute_url(self):
         return reverse('blog:post_detail', kwargs={'post_id': self.pk})
@@ -96,4 +98,5 @@ class Comment(models.Model):
         verbose_name_plural = 'Комментарии'
 
     def __str__(self) -> str:
-        return self.text
+        return (f'Комментарий автора {self.post.author.username}'
+                'к посту {self.post.title}, текст: {self.text}')

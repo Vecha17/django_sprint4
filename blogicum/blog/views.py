@@ -13,7 +13,7 @@ from blog.mixins import CommentMixin, PostAddition, PostDispMixin, PostMixin
 from blog.models import Category, Comment, Post, User
 
 
-class PostListView(PostAddition, PostMixin, ListView):
+class PostListView(PostAddition, ListView):
     template_name = 'blog/index.html'
 
 
@@ -31,12 +31,7 @@ class PostCreateView(LoginRequiredMixin, PostMixin, CreateView):
 
 
 class PostUpdateView(LoginRequiredMixin, PostMixin, PostDispMixin, UpdateView):
-
-    def get_success_url(self):
-        return reverse(
-            'blog:post_detail',
-            kwargs={'post_id': self.get_object().pk}
-        )
+    pass
 
 
 class PostDeleteView(LoginRequiredMixin, PostMixin, PostDispMixin, DeleteView):
@@ -100,11 +95,7 @@ class ProfileUser(PostAddition, ListView):
             User.objects.filter(username=self.kwargs['username'])
         )
         if _user == self.request.user:
-            return _user.posts.annotate(
-                comment_count=Count('comments')
-            ).select_related(
-                'category', 'author', 'location'
-            ).order_by('-pub_date')
+            return self.filter_method(_user.posts.all())
         return super().get_queryset().filter(author=_user)
 
     def get_context_data(self, **kwargs):
